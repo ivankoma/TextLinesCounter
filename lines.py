@@ -25,20 +25,22 @@ def Rotate(image):
 #----------------------------------------------------------------
 def Obfuscate(image):
     kernel = np.ones((5,20), np.uint8)
-    ret,transformed = cv2.threshold(image, 128, 255, cv2.THRESH_BINARY)
+    ret,transformed = cv2.threshold(image, 128, 255, cv2.THRESH_BINARY) #Make image black and white
     transformed = cv2.erode(transformed, kernel, iterations = 4) #best if 3-4
-    transformed = cv2.dilate(transformed, kernel, iterations = 3)
+    transformed = cv2.dilate(transformed, kernel, iterations = 3) #http://docs.opencv.org/2.4/doc/tutorials/imgproc/erosion_dilatation/erosion_dilatation.html
     
     # ^ is better
+    """
     #blur = cv2.blur(image, (200,1)) 
     
-    #kernel = np.ones((1,5), np.uint8)
-    #image = cv2.erode(blur, kernel, iterations = 5)
+    kernel = np.ones((1,5), np.uint8)
+    image = cv2.erode(blur, kernel, iterations = 3) #5
 
-    #kernel = np.ones((5,5), np.uint8)
-    #image = cv2.erode(blur, kernel, iterations = 5)
+    kernel = np.ones((5,5), np.uint8)
+    image = cv2.erode(blur, kernel, iterations = 3) #5
 
-    #ret,transformed = cv2.threshold(image, 200, 255, cv2.THRESH_BINARY)
+    ret,transformed = cv2.threshold(image, 200, 255, cv2.THRESH_BINARY)
+    """
     return transformed
 #----------------------------------------------------------------
 def SaveFile(path, transformed):
@@ -56,26 +58,25 @@ def main(path):
     
     x=0
     y=0
+    z=0
     numberOfColorChanges=0;
-    sumaPromenaStanja=0;
     previousColor=transformed[0,0];
-    biggestNumberOfColorChange=0;
+    highestNumberOfColorChange=0;
     while(x<transformed.shape[0]):
         while(y<transformed.shape[1]):      
             try:   
-                if transformed[y,x]!=previousColor:
+                if transformed[y,x]!=previousColor: #if previous color was white, and now is black, count that as color change
                     previousColor=transformed[y,x]
                     numberOfColorChanges+=1     
             except:
                 pass
             y=y+1
-        x+=1
+        x+=1 #increase to x+=10 for a greater speed, but lower accuracy
         y=0
-        sumaPromenaStanja+=numberOfColorChanges
-        if numberOfColorChanges>biggestNumberOfColorChange:
-            biggestNumberOfColorChange=numberOfColorChanges
+        if numberOfColorChanges>highestNumberOfColorChange:
+            highestNumberOfColorChange=numberOfColorChanges
         numberOfColorChanges=0
-    return biggestNumberOfColorChange/2
+    return highestNumberOfColorChange/2 #If image is white-black text-white that would count as 2 changes of color, hence we divide with 2
 #------------------------------------------------------------------------------------
 path = raw_input()
 totalImages=0
@@ -83,24 +84,25 @@ correctImages=0
 if os.path.isfile(path):
     count = main(path)
     print "Found " + str(count) + " lines"
+    #You can also check a solution read from .out file
 else:  
-    for root, subFolders, files in os.walk(path):  
+    for root, subFolders, files in os.walk(path):  #recursively finds all files in a given folder
         for file in files:  
             if file[file.rfind('.'):]!=".out":
                 print "---- ----"
                 print file
                 totalImages+=1
                 count = main(os.path.join(path, file))
-                solutionPath = os.path.join(path,file[0:file.rfind(".")] + ".out")
+                solutionPath = os.path.join(path,file[0:file.rfind(".")] + ".out") #Read a correct answer from a file named "z.out", if image is name "z.png"
                 solution = open(solutionPath).read()
                 print str(count) + "/" + str(solution)
                 if count==int(solution):           
-                    print "Correct"
-                    #print "\x1b[6;30;42m" + " Correct" + "\x1b[0m" #Colored, doesn't work in CMD
+                    #print "Correct"
+                    print "\x1b[6;30;42m" + " Correct" + "\x1b[0m" #Colored, doesn't work in CMD
                     correctImages+=1
                 else:                   
-                    print "Wrong!"
-                    #print "\x1b[6;30;41m" + " Wrong" + "\x1b[0m" 
+                    #print "Wrong!"
+                    print "\x1b[6;30;41m" + " Wrong" + "\x1b[0m" 
                    
     print "\nNumber of correct guesses: "
     print str(correctImages) + "/" + str(totalImages)
