@@ -102,5 +102,5 @@ else:
                     print "Wrong!"
                     #print "\x1b[6;30;41m" + " Wrong" + "\x1b[0m" 
                    
-    print "\nRatio of correct and wrong: "
+    print "\nNumber of correct guesses: "
     print str(correctImages) + "/" + str(totalImages)

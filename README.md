@@ -1,4 +1,4 @@
-#Python text lines counter
+# Python text lines counter
 
 Detects number of text lines for a given scanned textual document (image or a folder). 
 
@@ -8,6 +8,7 @@ Detects number of text lines for a given scanned textual document (image or a fo
 - Needs about 2 seconds per picture
 
 ![](1.png)
+
 ![](2.png)
 
 ### Usage
